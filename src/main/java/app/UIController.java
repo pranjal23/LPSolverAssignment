@@ -1,6 +1,7 @@
 package app;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import entity.DayTradeOrder;
 import entity.TraderOrders;
 import javafx.fxml.FXML;
 
@@ -10,6 +11,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import org.springframework.stereotype.Component;
+import solver.LPSolver;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,14 +42,34 @@ public class UIController {
         selectButton.setStyle("-fx-background-color: #457ecd; -fx-text-fill: #ffffff;");
     }
 
-    private void initTable(List<TraderOrders> traderOrders) {
-        tableView = new TableView<>();
-        ArrayList<TableColumn> columnHeaders = new ArrayList<>();
+    private void processTrades(List<TraderOrders> traderOrders) {
+        LPSolver solver = new LPSolver(traderOrders);
+        solver.createDayTradeOrders();
+        initTable(solver);
+    }
 
-        TableColumn date = new TableColumn("Date");
+    private void initTable(LPSolver solver) {
+        tableView = new TableView<>();
+
+        // Add headers
+        ArrayList<TableColumn> columnHeaders = new ArrayList<>();
+        TableColumn date = new TableColumn("Day");
         columnHeaders.add(date);
 
+        for(TraderOrders t_o : solver.getTraderOrders()){
+            String sw = String.format(" {SW:%s}", t_o.max_switching_window);
+            TableColumn trader = new TableColumn( t_o.trader + sw);
+            columnHeaders.add(trader);
+        }
         tableView.getColumns().addAll(columnHeaders);
+
+
+        // TODO Add rows after solving the problem
+        for(Integer k : solver.getDayTradeOrders().keySet()){
+            List<DayTradeOrder> dayTradeOrders = solver.getDayTradeOrders().get(k);
+
+        }
+
         dataContainer.getChildren().add(tableView);
     }
 
@@ -67,7 +89,7 @@ public class UIController {
             if(traderOrders != null && !traderOrders.isEmpty()){
                 Stage thisStage = (Stage) dataContainer.getScene().getWindow();
                 thisStage.setMaximized(true);
-                initTable(traderOrders);
+                processTrades(traderOrders);
             }
 
         } catch (IOException e) {
