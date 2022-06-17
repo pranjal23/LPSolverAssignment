@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import entity.TraderOrders;
 import javafx.fxml.FXML;
 
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -68,11 +65,21 @@ public class UIController {
             TraderOrders[] root = om.readValue(myJsonString, TraderOrders[].class);
             List<TraderOrders> traderOrders = Arrays.asList(root);
             if(traderOrders != null && !traderOrders.isEmpty()){
+                Stage thisStage = (Stage) dataContainer.getScene().getWindow();
+                thisStage.setMaximized(true);
                 initTable(traderOrders);
             }
 
         } catch (IOException e) {
             System.out.println(e.getMessage());
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle(e.getMessage());
+            alert.setHeaderText("Unable to read json trader file!");
+            alert.showAndWait().ifPresent(rs -> {
+                if (rs == ButtonType.OK) {
+                    alert.close();
+                }
+            });
         }
     }
 }
