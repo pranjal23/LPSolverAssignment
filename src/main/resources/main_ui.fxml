@@ -12,9 +12,9 @@
 
         <HBox id="HBox" alignment="CENTER" spacing="5.0">
             <children>
-                <Label text="Search Text:"/>
-                <TextField fx:id="searchField"/>
-                <Button fx:id="searchButton"/>
+                <Label text="Select Nominal Trade JSON File:"/>
+                <TextField fx:id="selectField"/>
+                <Button fx:id="selectButton"/>
             </children>
         </HBox>
 

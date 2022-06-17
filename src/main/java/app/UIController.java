@@ -1,7 +1,9 @@
 package app;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import entity.TraderOrders;
 import javafx.fxml.FXML;
-import javafx.scene.chart.LineChart;
+
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -9,18 +11,24 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import net.rgielen.fxweaver.core.FxmlView;
+
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Component
 public class UIController {
     @FXML
-    private TextField searchField;
+    private TextField selectField;
     @FXML
-    private Button searchButton;
+    private Button selectButton;
     @FXML
     private VBox dataContainer;
     @FXML
@@ -29,12 +37,13 @@ public class UIController {
     @FXML
     private void initialize() {
         // search panel
-        searchButton.setText("Select Nominal Trade File");
-        searchButton.setOnAction(event -> locateFile());
-        searchButton.setStyle("-fx-background-color: #457ecd; -fx-text-fill: #ffffff;");
+        selectField.setEditable(false);
+        selectButton.setText("Select");
+        selectButton.setOnAction(event -> locateFile());
+        selectButton.setStyle("-fx-background-color: #457ecd; -fx-text-fill: #ffffff;");
     }
 
-    private void initTable(File file) {
+    private void initTable(List<TraderOrders> traderOrders) {
         tableView = new TableView<>();
         ArrayList<TableColumn> columnHeaders = new ArrayList<>();
 
@@ -46,10 +55,24 @@ public class UIController {
     }
 
     @FXML
-    protected void locateFile() {
+    protected void locateFile(){
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Open File");
         File file = chooser.showOpenDialog(new Stage());
-        initTable(file);
+        selectField.setText(file.getAbsolutePath());
+
+        try {
+            byte[] bytes = Files.readAllBytes(Paths.get(file.getAbsolutePath()));
+            String myJsonString = new String (bytes);
+            ObjectMapper om = new ObjectMapper();
+            TraderOrders[] root = om.readValue(myJsonString, TraderOrders[].class);
+            List<TraderOrders> traderOrders = Arrays.asList(root);
+            if(traderOrders != null && !traderOrders.isEmpty()){
+                initTable(traderOrders);
+            }
+
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
 }
