@@ -21,6 +21,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class UIController {
@@ -63,11 +64,9 @@ public class UIController {
         }
         tableView.getColumns().addAll(columnHeaders);
 
-
         // TODO Add rows after solving the problem
         for(Integer k : solver.getDayTradeOrders().keySet()){
-            List<DayTradeOrder> dayTradeOrders = solver.getDayTradeOrders().get(k);
-
+            Map<Integer, DayTradeOrder> dayTradeOrders = solver.getDayTradeOrders().get(k);
         }
 
         dataContainer.getChildren().add(tableView);
@@ -86,7 +85,7 @@ public class UIController {
             ObjectMapper om = new ObjectMapper();
             TraderOrders[] root = om.readValue(myJsonString, TraderOrders[].class);
             List<TraderOrders> traderOrders = Arrays.asList(root);
-            if(traderOrders != null && !traderOrders.isEmpty()){
+            if(!traderOrders.isEmpty()){
                 Stage thisStage = (Stage) dataContainer.getScene().getWindow();
                 thisStage.setMaximized(true);
                 processTrades(traderOrders);

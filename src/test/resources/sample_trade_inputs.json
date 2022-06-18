@@ -4,11 +4,16 @@
       "max_switching_window": 5,
       "orders": [
         {"day": 1, "notional": 150},
+        {"day": 2, "notional": 0},
         {"day": 3, "notional": 200},
         {"day": 4, "notional": -500},
+        {"day": 5, "notional": 0},
         {"day": 6, "notional": -500},
         {"day": 7, "notional": 200},
-        {"day": 9, "notional": -300}
+        {"day": 8, "notional": 0},
+        {"day": 9, "notional": -300},
+        {"day": 10, "notional": 0},
+        {"day": 11, "notional": 0}
       ]
     },
     {
@@ -16,20 +21,33 @@
       "max_switching_window": 7,
       "orders": [
         {"day": 1, "notional": -100},
+        {"day": 2, "notional": 0},
         {"day": 3, "notional": -125},
         {"day": 4, "notional": 500},
+        {"day": 5, "notional": 0},
         {"day": 6, "notional": 350},
         {"day": 7, "notional": -150},
-        {"day": 9, "notional": 150}
+        {"day": 8, "notional": 0},
+        {"day": 9, "notional": 150},
+        {"day": 10, "notional": 0},
+        {"day": 11, "notional": 0}
       ]
     },
     {
       "trader": "Bob",
       "max_switching_window": 3,
       "orders": [
+        {"day": 1, "notional": 0},
+        {"day": 2, "notional": 0},
+        {"day": 3, "notional": 0},
+        {"day": 4, "notional": 0},
+        {"day": 5, "notional": 0},
         {"day": 6, "notional": 80},
         {"day": 7, "notional": 200},
-        {"day": 9, "notional": -40}
+        {"day": 8, "notional": 0},
+        {"day": 9, "notional": -40},
+        {"day": 10, "notional": 0},
+        {"day": 11, "notional": 0}
       ]
     }
 ]

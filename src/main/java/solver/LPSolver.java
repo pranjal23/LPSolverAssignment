@@ -13,9 +13,9 @@ public class LPSolver {
 
     // Parse the traders orders and build the objectives and constraints.
     // Find number of Traders
-    // Solve each objective sequentially.
+    // Build day trade Orders to solve each objective sequentially.
     List<TraderOrders> mTraderOrders;
-    Map<Integer, List<DayTradeOrder>> mDayTradeOrders;
+    Map<Integer, Map<Integer, DayTradeOrder>> mDayTradeOrders;
 
     Integer mNumberOfTraders;
 
@@ -26,6 +26,7 @@ public class LPSolver {
     }
 
     public void createDayTradeOrders(){
+        // Create real trade orders
         mDayTradeOrders = new HashMap<>();
         AtomicInteger idx = new AtomicInteger();
         mTraderOrders.forEach( (t_o) -> {
@@ -34,34 +35,35 @@ public class LPSolver {
                 DayTradeOrder dayTradeOrder = new DayTradeOrder(idx.get(),
                         t_o.trader, t_o.max_switching_window,
                         o.day, o.notional);
-                List<DayTradeOrder> dayTradeList = mDayTradeOrders.get(Integer.valueOf(idx.get()));
-                if(dayTradeList == null){
-                    dayTradeList = new ArrayList<>();
+                Map<Integer, DayTradeOrder> dayTradeMap = mDayTradeOrders.get(idx.get());
+                if(dayTradeMap == null){
+                    dayTradeMap = new HashMap<>();
                 }
-                dayTradeList.add(dayTradeOrder);
-                mDayTradeOrders.put(Integer.valueOf(idx.get()), dayTradeList);
+                dayTradeMap.put(dayTradeOrder.getTrade_order_idx(),dayTradeOrder);
+                mDayTradeOrders.put(idx.get(), dayTradeMap);
                 if(t_o.max_switching_window > mMaxDays){
-                    mMaxDays = Integer.valueOf(t_o.max_switching_window);
+                    mMaxDays = t_o.max_switching_window;
                 }
             });
         });
 
-        mNumberOfTraders = Integer.valueOf(idx.get());
+        // Set number of traders
+        mNumberOfTraders = idx.get();
     }
 
     public List<TraderOrders> getTraderOrders(){
         return mTraderOrders;
     }
 
-    public Map<Integer, List<DayTradeOrder>> getDayTradeOrders(){
+    public Map<Integer, Map<Integer, DayTradeOrder>> getDayTradeOrders(){
         return mDayTradeOrders;
     }
 
     public int getNumberOfTraders(){
-        return mNumberOfTraders.intValue();
+        return mNumberOfTraders;
     }
 
     public int getMaxDays(){
-        return mMaxDays.intValue();
+        return mMaxDays;
     }
 }
