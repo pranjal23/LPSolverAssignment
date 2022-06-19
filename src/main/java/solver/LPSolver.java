@@ -33,40 +33,42 @@ public class LPSolver {
             // go through the traders
             for(int traderIdx=1; traderIdx<=N; traderIdx++){
                 DayTradeOrder dto = preprocessor.getDayTraderOrderMap().get(day).get(traderIdx);
-                int varIdx = LPSolverUtil.getVariableIndex(M,day, traderIdx);
+                int unknownVariableIndex = LPSolverUtil.getUnknownVariableIndex(M,day, traderIdx);
                 if(dto.getNotional()>0) {
-                    solver.setBounds(varIdx,0, dto.getNotional());
+                    solver.setBounds(unknownVariableIndex,0, dto.getNotional());
                 } else {
-                    solver.setBounds(varIdx, dto.getNotional(), 0);
+                    solver.setBounds(unknownVariableIndex, dto.getNotional(), 0);
                 }
             }
         }
-
-
+        
         // add net zero constraints per trader
         for(int idx=1; idx<=N; idx++){
-            int arr[] = new int[unknownVariables];
+            double constraintArray[] = new double[unknownVariables];
             for(int day=1; day<=M; day++){
                 for(int traderIdx=1; traderIdx<=N; traderIdx++){
-
+                    int unknownVariableIndex = LPSolverUtil.getUnknownVariableIndex(M,day, traderIdx);
+                    if(idx==traderIdx){
+                        constraintArray[unknownVariableIndex] = 1;
+                    } else {
+                        constraintArray[unknownVariableIndex] = 0;
+                    }
                 }
             }
-            solver.strAddConstraint("6 9", LpSolve.LE, 72);
+            solver.addConstraint(constraintArray, LpSolve.EQ,0);
         }
 
         // TODO add switching window constraints
 
 
         // set coefficients of each variable of objective function to 1s
-        StringBuilder objectiveFn = new StringBuilder();
+        double objFnArray[] = new double[unknownVariables];
         for(int i=1; i <= unknownVariables; i++){
-            objectiveFn.append("1");
-            if(i<unknownVariables)
-                objectiveFn.append(" ");
+            objFnArray[i] = 1;
         }
 
         // set the objective function
-        solver.strSetObjFn(objectiveFn.toString());
+        solver.setObjFn(objFnArray);
 
         // set to maximize objective function
         solver.setMaxim();
