@@ -1,3 +1,8 @@
+/*
+Copyright (c) 2022 Pranjal Swarup
+All rights reserved
+*/
+
 package app;
 
 import javafx.application.Application;
