@@ -22,6 +22,7 @@
               AnchorPane.leftAnchor="10.0"
               AnchorPane.rightAnchor="10.0"
               AnchorPane.topAnchor="50.0">
+            <Label fx:id="statusLabel" text="No input file." />
         </VBox>
 
     </children>

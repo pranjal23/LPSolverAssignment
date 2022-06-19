@@ -6,7 +6,7 @@ All rights reserved
 package app;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import solver.entity.DayTradeOrder;
+import solver.SolverTask;
 import solver.entity.TraderOrders;
 import javafx.fxml.FXML;
 
@@ -37,6 +37,8 @@ public class UIController {
     private VBox dataContainer;
     @FXML
     private TableView tableView;
+    @FXML
+    private Label statusLabel;
 
     @FXML
     private void initialize() {
@@ -48,31 +50,40 @@ public class UIController {
     }
 
     private void processTrades(List<TraderOrders> traderOrders) {
-        LPSolvePreprocessor solver = new LPSolvePreprocessor(traderOrders);
-        solver.createDayTradeOrders();
-        initTable(solver);
+        // Create a preprocessor process the file
+        LPSolvePreprocessor preprocessor = new LPSolvePreprocessor(traderOrders);
+        SolverTask solverTask = new SolverTask(preprocessor,this);
+        solverTask.exceptionProperty().addListener((observable, oldValue, newValue) ->  {
+            if(newValue != null) {
+                Exception ex = (Exception) newValue;
+                ex.printStackTrace();
+                statusLabel.setText(ex.getMessage());
+            }
+        });
+
+        // Start the task on a seperate thread
+        Thread th = new Thread(solverTask);
+        th.setDaemon(true);
+        th.start();
     }
 
-    private void initTable(LPSolvePreprocessor solver) {
+    public void initTable(LPSolvePreprocessor preprocessor, double[] results) {
         tableView = new TableView<>();
-
         // Add headers
         ArrayList<TableColumn> columnHeaders = new ArrayList<>();
         TableColumn date = new TableColumn("Day");
         columnHeaders.add(date);
 
-        for(TraderOrders t_o : solver.getTraderOrders()){
+        for(TraderOrders t_o : preprocessor.getTraderOrders()){
             String sw = String.format(" {SW:%s}", t_o.max_switching_window);
             TableColumn trader = new TableColumn( t_o.trader + sw);
             columnHeaders.add(trader);
         }
         tableView.getColumns().addAll(columnHeaders);
 
-        // TODO Add rows after solving the problem
-        for(Integer k : solver.getDayTraderOrderMap().keySet()){
-            Map<Integer, DayTradeOrder> dayTradeOrders = solver.getDayTraderOrderMap().get(k);
-        }
+        statusLabel.setText(Arrays.toString(results));
 
+        // TODO Add rows after solving the problem
         dataContainer.getChildren().add(tableView);
     }
 
