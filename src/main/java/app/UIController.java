@@ -1,8 +1,8 @@
 package app;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import entity.DayTradeOrder;
-import entity.TraderOrders;
+import solver.entity.DayTradeOrder;
+import solver.entity.TraderOrders;
 import javafx.fxml.FXML;
 
 import javafx.scene.control.*;
@@ -11,11 +11,10 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import org.springframework.stereotype.Component;
-import solver.LPSolver;
+import solver.LPSolvePreprocessor;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -44,12 +43,12 @@ public class UIController {
     }
 
     private void processTrades(List<TraderOrders> traderOrders) {
-        LPSolver solver = new LPSolver(traderOrders);
+        LPSolvePreprocessor solver = new LPSolvePreprocessor(traderOrders);
         solver.createDayTradeOrders();
         initTable(solver);
     }
 
-    private void initTable(LPSolver solver) {
+    private void initTable(LPSolvePreprocessor solver) {
         tableView = new TableView<>();
 
         // Add headers
@@ -65,8 +64,8 @@ public class UIController {
         tableView.getColumns().addAll(columnHeaders);
 
         // TODO Add rows after solving the problem
-        for(Integer k : solver.getDayTradeOrders().keySet()){
-            Map<Integer, DayTradeOrder> dayTradeOrders = solver.getDayTradeOrders().get(k);
+        for(Integer k : solver.getDayTraderOrderMap().keySet()){
+            Map<Integer, DayTradeOrder> dayTradeOrders = solver.getDayTraderOrderMap().get(k);
         }
 
         dataContainer.getChildren().add(tableView);
