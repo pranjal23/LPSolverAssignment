@@ -100,7 +100,7 @@ public class UIController {
         }
 
         // Add results of solving the LP problem
-        statusLabel.setText("Results");
+        statusLabel.setText("Trades Matched:");
         tableView.setItems(period_data);
         dataContainer.getChildren().add(tableView);
         Stage thisStage = (Stage) dataContainer.getScene().getWindow();

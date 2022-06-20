@@ -45,7 +45,7 @@ public class LPSolvePreprocessor {
                 }
                 dayTradeMap.put(dayTradeOrder.getTraderIdx(),dayTradeOrder);
                 mDayTraderOrderMap.put(dayTradeOrder.getDay(), dayTradeMap);
-                if(dayTradeOrder.getDay() > mMaxDays){
+                if(dayTradeOrder.getDay() > mMaxDays && dayTradeOrder.getNotional() !=0 ){
                     mMaxDays = dayTradeOrder.getDay();
                 }
             });

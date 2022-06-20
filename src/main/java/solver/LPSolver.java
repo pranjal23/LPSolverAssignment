@@ -48,7 +48,7 @@ public class LPSolver {
         
         // add net zero constraints per trader
         for(int idx=1; idx<=N; idx++){
-            double[] constraintArray = new double[unknownVariables+1]; //LPsolve ignore index 0
+            double[] constraintArray = new double[unknownVariables+1]; //LPsolve ignores index 0
             for(int day=1; day<=M; day++){
                 for(int traderIdx=1; traderIdx<=N; traderIdx++){
                     int unknownVariableIndex = LPSolverUtil.getUnknownVariableIndex(M,day, traderIdx);
@@ -64,7 +64,7 @@ public class LPSolver {
 
         // add net zero constraints per day
         for(int dDay=1; dDay<=M; dDay++){
-            double[] constraintArray = new double[unknownVariables+1]; //LPsolve ignore index 0
+            double[] constraintArray = new double[unknownVariables+1]; //LPsolve ignores index 0
             for(int day=1; day<=M; day++){
                 for(int traderIdx=1; traderIdx<=N; traderIdx++){
                     int unknownVariableIndex = LPSolverUtil.getUnknownVariableIndex(M,day, traderIdx);
@@ -78,11 +78,46 @@ public class LPSolver {
             solver.addConstraint(constraintArray, LpSolve.EQ,0);
         }
 
-        // TODO add switching window constraints
+        // add switching window constraints
+        // Check if a trade is buy or a sell, set coefficient to 1
+        // set the same coefficient 1 for all offset trade during the switching window
+        // set the coefficient for all same type trades to 0 to ignore them
+        for(int idx=1; idx<=N; idx++){
+            // find the max switching window for the trader
+            int maxSwitchingWindow = preprocessor.getDayTraderOrderMap().get(1).get(idx).getMaxSwitchingWindow();
+            for(int tradeDay=1; tradeDay+maxSwitchingWindow<=M; tradeDay++){
+                double[] constraintArray = new double[unknownVariables+1]; //LPsolve ignores index 0
+                Arrays.fill(constraintArray,0);
 
+                DayTradeOrder tradeDay_dto = preprocessor.getDayTraderOrderMap().get(tradeDay).get(idx);
+                if(tradeDay_dto.getNotional()!=0){
+                    for(int day=1; day<=M; day++){
+                        DayTradeOrder dto = preprocessor.getDayTraderOrderMap().get(day).get(idx);
+                        int unknownVariableIndex = LPSolverUtil.getUnknownVariableIndex(M, day, idx);
+                        if(day==tradeDay){
+                            constraintArray[unknownVariableIndex] = 1;
+                        }
+                        else if (day > tradeDay && day <= tradeDay + tradeDay_dto.getMaxSwitchingWindow()) {
+                            if(tradeDay_dto.getNotional()>0 && dto.getNotional() < 0){
+                                constraintArray[unknownVariableIndex] = 1;
+                            } else if (tradeDay_dto.getNotional()<0 && dto.getNotional() > 0) {
+                                constraintArray[unknownVariableIndex] = 1;
+                            }
+                        }
+                    }
 
-        // set coefficients of each variable of objective function, +1 for sell, -1 for buy (mock abs fn)
-        double[] objFnArray = new double[unknownVariables+1]; //LPsolve ignore index 0
+                    if(tradeDay_dto.getNotional() > 0){
+                        solver.addConstraint(constraintArray, LpSolve.LE,0);
+                    }
+                    else {
+                        solver.addConstraint(constraintArray, LpSolve.GE,0);
+                    }
+                }
+            }
+        }
+
+        // set coefficients of each variable of objective function, +1 for sell, -1 for buy (as a mock abs() fn)
+        double[] objFnArray = new double[unknownVariables+1]; //LPsolve ignores index 0
         for(int day=1; day<=M; day++){
             // go through the traders
             for(int traderIdx=1; traderIdx<=N; traderIdx++){
