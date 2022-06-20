@@ -8,6 +8,8 @@ import lpsolve.LpSolve;
 import lpsolve.LpSolveException;
 import solver.entity.DayTradeOrder;
 
+import java.util.Arrays;
+
 public class LPSolver {
     public static double[] solve(LPSolvePreprocessor preprocessor) throws LpSolveException {
         int M = preprocessor.getMaxDays();
@@ -46,15 +48,14 @@ public class LPSolver {
         
         // add net zero constraints per trader
         for(int idx=1; idx<=N; idx++){
-            double constraintArray[] = new double[unknownVariables];
+            double[] constraintArray = new double[unknownVariables+1]; //LPsolve ignore index 0
             for(int day=1; day<=M; day++){
                 for(int traderIdx=1; traderIdx<=N; traderIdx++){
                     int unknownVariableIndex = LPSolverUtil.getUnknownVariableIndex(M,day, traderIdx);
-                    int indexInArray = unknownVariableIndex - 1; // as arrays begin from 0
                     if(idx==traderIdx){
-                        constraintArray[indexInArray] = 1;
+                        constraintArray[unknownVariableIndex] = 1;
                     } else {
-                        constraintArray[indexInArray] = 0;
+                        constraintArray[unknownVariableIndex] = 0;
                     }
                 }
             }
@@ -65,10 +66,9 @@ public class LPSolver {
 
 
         // set coefficients of each variable of objective function to 1s
-        double objFnArray[] = new double[unknownVariables];
+        double[] objFnArray = new double[unknownVariables+1]; //LPsolve ignore index 0
         for(int i=1; i <= unknownVariables; i++){
-            int indexInArray = i - 1; // as arrays begin from 0
-            objFnArray[indexInArray] = 1;
+            objFnArray[i] = 1;
         }
 
         // set the objective function
