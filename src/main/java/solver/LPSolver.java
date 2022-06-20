@@ -12,6 +12,8 @@ public class LPSolver {
     public static double[] solve(LPSolvePreprocessor preprocessor) throws LpSolveException {
         int M = preprocessor.getMaxDays();
         int N = preprocessor.getNumberOfTraders();
+        System.out.println("Count days: " + M);
+        System.out.println("Count traders: " + N);
 
         // define the total number of variables
         int unknownVariables = M * N;
@@ -48,10 +50,11 @@ public class LPSolver {
             for(int day=1; day<=M; day++){
                 for(int traderIdx=1; traderIdx<=N; traderIdx++){
                     int unknownVariableIndex = LPSolverUtil.getUnknownVariableIndex(M,day, traderIdx);
+                    int indexInArray = unknownVariableIndex - 1; // as arrays begin from 0
                     if(idx==traderIdx){
-                        constraintArray[unknownVariableIndex] = 1;
+                        constraintArray[indexInArray] = 1;
                     } else {
-                        constraintArray[unknownVariableIndex] = 0;
+                        constraintArray[indexInArray] = 0;
                     }
                 }
             }
@@ -64,7 +67,8 @@ public class LPSolver {
         // set coefficients of each variable of objective function to 1s
         double objFnArray[] = new double[unknownVariables];
         for(int i=1; i <= unknownVariables; i++){
-            objFnArray[i] = 1;
+            int indexInArray = i - 1; // as arrays begin from 0
+            objFnArray[indexInArray] = 1;
         }
 
         // set the objective function

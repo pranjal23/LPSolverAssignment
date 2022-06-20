@@ -38,14 +38,15 @@ public class LPSolvePreprocessor {
                 DayTradeOrder dayTradeOrder = new DayTradeOrder(idx.get(),
                         t_o.trader, t_o.max_switching_window,
                         o.day, o.notional);
+
                 Map<Integer, DayTradeOrder> dayTradeMap = mDayTraderOrderMap.get(dayTradeOrder.getDay());
                 if(dayTradeMap == null){
                     dayTradeMap = new HashMap<>();
                 }
                 dayTradeMap.put(dayTradeOrder.getTraderIdx(),dayTradeOrder);
                 mDayTraderOrderMap.put(dayTradeOrder.getDay(), dayTradeMap);
-                if(t_o.max_switching_window > mMaxDays){
-                    mMaxDays = t_o.max_switching_window;
+                if(dayTradeOrder.getDay() > mMaxDays){
+                    mMaxDays = dayTradeOrder.getDay();
                 }
             });
         });

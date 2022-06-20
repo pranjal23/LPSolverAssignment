@@ -6,6 +6,9 @@ All rights reserved
 package app;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import solver.SolverTask;
 import solver.entity.TraderOrders;
 import javafx.fxml.FXML;
@@ -25,7 +28,11 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TableColumn.CellDataFeatures;
+import javafx.util.Callback;
 
 @Component
 public class UIController {
@@ -36,7 +43,7 @@ public class UIController {
     @FXML
     private VBox dataContainer;
     @FXML
-    private TableView tableView;
+    private TableView<ObservableList> tableView;
     @FXML
     private Label statusLabel;
 
@@ -67,23 +74,34 @@ public class UIController {
         th.start();
     }
 
-    public void initTable(LPSolvePreprocessor preprocessor, double[] results) {
+    public void initTable(LPSolvePreprocessor preprocessor,  ObservableList<ObservableList> period_data) {
         tableView = new TableView<>();
         // Add headers
-        ArrayList<TableColumn> columnHeaders = new ArrayList<>();
-        TableColumn date = new TableColumn("Day");
-        columnHeaders.add(date);
+        ArrayList<String> columnHeaders = new ArrayList<>();
+        columnHeaders.add("Day");
 
         for(TraderOrders t_o : preprocessor.getTraderOrders()){
-            String sw = String.format(" {SW:%s}", t_o.max_switching_window);
-            TableColumn trader = new TableColumn( t_o.trader + sw);
-            columnHeaders.add(trader);
+            String sw = String.format(" {Switching Window: %s}", t_o.max_switching_window);
+            columnHeaders.add(t_o.trader + sw);
         }
-        tableView.getColumns().addAll(columnHeaders);
 
-        statusLabel.setText(Arrays.toString(results));
+        tableView = new TableView<>();
+        for (int i = 0; i < columnHeaders.size(); i++) {
+            TableColumn tc = new TableColumn(columnHeaders.get(i));
+            final int colNo = i;
+            tc.setCellValueFactory(new Callback<CellDataFeatures<ObservableList<String>, String>, ObservableValue<String>>() {
+                @Override
+                public ObservableValue<String> call(CellDataFeatures<ObservableList<String>, String> p) {
+                    return new SimpleStringProperty((p.getValue().get(colNo)));
+                }
+            });
+            tc.setPrefWidth(90);
+            tableView.getColumns().add(tc);
+        }
 
-        // TODO Add rows after solving the problem
+        // Add results of solving the LP problem
+        statusLabel.setText("Results");
+        tableView.setItems(period_data);
         dataContainer.getChildren().add(tableView);
     }
 
@@ -92,30 +110,31 @@ public class UIController {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Open File");
         File file = chooser.showOpenDialog(new Stage());
-        selectField.setText(file.getAbsolutePath());
-
-        try {
-            byte[] bytes = Files.readAllBytes(Paths.get(file.getAbsolutePath()));
-            String myJsonString = new String (bytes);
-            ObjectMapper om = new ObjectMapper();
-            TraderOrders[] root = om.readValue(myJsonString, TraderOrders[].class);
-            List<TraderOrders> traderOrders = Arrays.asList(root);
-            if(!traderOrders.isEmpty()){
-                Stage thisStage = (Stage) dataContainer.getScene().getWindow();
-                thisStage.setMaximized(true);
-                processTrades(traderOrders);
-            }
-
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle(e.getMessage());
-            alert.setHeaderText("Unable to read json trader file!");
-            alert.showAndWait().ifPresent(rs -> {
-                if (rs == ButtonType.OK) {
-                    alert.close();
+        if(file!=null){
+            selectField.setText(file.getAbsolutePath());
+            try {
+                byte[] bytes = Files.readAllBytes(Paths.get(file.getAbsolutePath()));
+                String myJsonString = new String (bytes);
+                ObjectMapper om = new ObjectMapper();
+                TraderOrders[] root = om.readValue(myJsonString, TraderOrders[].class);
+                List<TraderOrders> traderOrders = Arrays.asList(root);
+                if(!traderOrders.isEmpty()){
+                    Stage thisStage = (Stage) dataContainer.getScene().getWindow();
+                    thisStage.setMaximized(true);
+                    processTrades(traderOrders);
                 }
-            });
+
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle(e.getMessage());
+                alert.setHeaderText("Unable to read json trader file!");
+                alert.showAndWait().ifPresent(rs -> {
+                    if (rs == ButtonType.OK) {
+                        alert.close();
+                    }
+                });
+            }
         }
     }
 }

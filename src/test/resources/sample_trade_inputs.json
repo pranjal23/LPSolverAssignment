@@ -11,9 +11,7 @@
         {"day": 6, "notional": -500},
         {"day": 7, "notional": 200},
         {"day": 8, "notional": 0},
-        {"day": 9, "notional": -300},
-        {"day": 10, "notional": 0},
-        {"day": 11, "notional": 0}
+        {"day": 9, "notional": -300}
       ]
     },
     {
@@ -28,9 +26,7 @@
         {"day": 6, "notional": 350},
         {"day": 7, "notional": -150},
         {"day": 8, "notional": 0},
-        {"day": 9, "notional": 150},
-        {"day": 10, "notional": 0},
-        {"day": 11, "notional": 0}
+        {"day": 9, "notional": 150}
       ]
     },
     {
@@ -45,9 +41,7 @@
         {"day": 6, "notional": 80},
         {"day": 7, "notional": 200},
         {"day": 8, "notional": 0},
-        {"day": 9, "notional": -40},
-        {"day": 10, "notional": 0},
-        {"day": 11, "notional": 0}
+        {"day": 9, "notional": -40}
       ]
     }
 ]
