@@ -16,6 +16,7 @@ Use IntelliJ idea or any other idea to get the Maven plugin
 
 ## Build & RUN
 mvn clean install (from the directory that run from the directory that contains pom.xml)
+A lp-assignment-0.0.1-SNAPSHOT.jar is built inside the target folder.
 
 ![img_1.png](img_1.png)
 
