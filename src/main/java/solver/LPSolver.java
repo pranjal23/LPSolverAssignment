@@ -118,14 +118,15 @@ public class LPSolver {
 
         // set coefficients of each variable of objective function, +1 for sell, -1 for buy (as a mock abs() fn)
         double[] objFnArray = new double[unknownVariables+1]; //LPsolve ignores index 0
+        Arrays.fill(objFnArray,0);
         for(int day=1; day<=M; day++){
             // go through the traders
             for(int traderIdx=1; traderIdx<=N; traderIdx++){
                 DayTradeOrder dto = preprocessor.getDayTraderOrderMap().get(day).get(traderIdx);
                 int unknownVariableIndex = LPSolverUtil.getUnknownVariableIndex(M,day, traderIdx);
-                if(dto.getNotional()>0) {
+                if(dto.getNotional() > 0) {
                     objFnArray[unknownVariableIndex] = 1;
-                } else {
+                } else if(dto.getNotional() < 0)  {
                     objFnArray[unknownVariableIndex] = -1;
                 }
             }
