@@ -7,10 +7,11 @@
 <AnchorPane
         xmlns:fx="http://javafx.com/fxml"
         xmlns="http://javafx.com/javafx"
-        fx:controller="app.UIController">
+        fx:controller="app.UIController"
+        minWidth="1024">
     <children>
 
-        <HBox id="HBox" alignment="CENTER" spacing="5.0">
+        <HBox id="HBox" alignment="CENTER" spacing="5.0" AnchorPane.leftAnchor="10.0">
             <children>
                 <Label text="Select Nominal Trade JSON File:"/>
                 <TextField fx:id="selectField"/>
@@ -20,7 +21,6 @@
 
         <VBox fx:id="dataContainer"
               AnchorPane.leftAnchor="10.0"
-              AnchorPane.rightAnchor="10.0"
               AnchorPane.topAnchor="50.0">
             <Label fx:id="statusLabel" text="No input file." />
         </VBox>

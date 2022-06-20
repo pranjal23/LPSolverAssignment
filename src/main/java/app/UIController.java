@@ -103,6 +103,9 @@ public class UIController {
         statusLabel.setText("Results");
         tableView.setItems(period_data);
         dataContainer.getChildren().add(tableView);
+        Stage thisStage = (Stage) dataContainer.getScene().getWindow();
+        thisStage.setWidth(512);
+        thisStage.setHeight(400);
     }
 
     @FXML
@@ -119,8 +122,6 @@ public class UIController {
                 TraderOrders[] root = om.readValue(myJsonString, TraderOrders[].class);
                 List<TraderOrders> traderOrders = Arrays.asList(root);
                 if(!traderOrders.isEmpty()){
-                    Stage thisStage = (Stage) dataContainer.getScene().getWindow();
-                    thisStage.setMaximized(true);
                     processTrades(traderOrders);
                 }
 
