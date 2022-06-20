@@ -27,7 +27,9 @@ public class SolverTask extends Task {
         preprocessor.createDayTradeOrders();
         // Build and solve the LP problem from the pre-processed data
         double[] results = LPSolver.solve(preprocessor);
-        System.out.println(Arrays.toString(results));
+        //System.out.println(Arrays.toString(results));
+
+        // Convert to 2D list for display
         int M = preprocessor.getMaxDays();
         int N = preprocessor.getNumberOfTraders();
 
@@ -52,7 +54,7 @@ public class SolverTask extends Task {
                 period_data.get(i).set(traderIdx, Integer.valueOf((int) value).toString());
             }
         }
-        System.out.println(period_data.toString());
+        //System.out.println(period_data.toString());
         return new Object();
     }
 

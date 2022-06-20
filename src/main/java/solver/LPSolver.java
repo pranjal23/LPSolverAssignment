@@ -81,10 +81,19 @@ public class LPSolver {
         // TODO add switching window constraints
 
 
-        // set coefficients of each variable of objective function to 1s
+        // set coefficients of each variable of objective function, +1 for sell, -1 for buy (mock abs fn)
         double[] objFnArray = new double[unknownVariables+1]; //LPsolve ignore index 0
-        for(int i=1; i <= unknownVariables; i++){
-            objFnArray[i] = 1;
+        for(int day=1; day<=M; day++){
+            // go through the traders
+            for(int traderIdx=1; traderIdx<=N; traderIdx++){
+                DayTradeOrder dto = preprocessor.getDayTraderOrderMap().get(day).get(traderIdx);
+                int unknownVariableIndex = LPSolverUtil.getUnknownVariableIndex(M,day, traderIdx);
+                if(dto.getNotional()>0) {
+                    objFnArray[unknownVariableIndex] = 1;
+                } else {
+                    objFnArray[unknownVariableIndex] = -1;
+                }
+            }
         }
 
         // set the objective function
