@@ -62,6 +62,22 @@ public class LPSolver {
             solver.addConstraint(constraintArray, LpSolve.EQ,0);
         }
 
+        // add net zero constraints per day
+        for(int dDay=1; dDay<=M; dDay++){
+            double[] constraintArray = new double[unknownVariables+1]; //LPsolve ignore index 0
+            for(int day=1; day<=M; day++){
+                for(int traderIdx=1; traderIdx<=N; traderIdx++){
+                    int unknownVariableIndex = LPSolverUtil.getUnknownVariableIndex(M,day, traderIdx);
+                    if(dDay==day){
+                        constraintArray[unknownVariableIndex] = 1;
+                    } else {
+                        constraintArray[unknownVariableIndex] = 0;
+                    }
+                }
+            }
+            solver.addConstraint(constraintArray, LpSolve.EQ,0);
+        }
+
         // TODO add switching window constraints
 
 
